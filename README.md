@@ -1,10 +1,33 @@
 # brightspace-mcp
 
-A general, single-user MCP server for D2L Brightspace on Linux and Node.js 24 or 26. A dedicated Playwright profile supplies the session; course operations use HTTP APIs. Codex discovers contracts and composes requests. There are no course-specific teaching policies, UI automation tools, or production changes during installation.
+An instructor-facing, single-user MCP server for D2L Brightspace on Linux and Node.js 24 or 26. It supports course management, quiz configuration, gradebook work, and instructor analysis through composable API requests. A dedicated Playwright profile supplies the session; all course reads and writes use HTTP APIs. Codex discovers contracts and composes requests. Teaching policies and grading decisions belong to the instructor and client workflow.
 
 The implementation follows [DESIGN.md](DESIGN.md). Its catalog describes known contracts; it does not limit generic access to the configured API boundary.
 
 The primary command is `brightspace-mcp`; `d2l-mcp` remains an alias. Configuration and state retain their existing `d2l-mcp` paths so saved sessions keep working. The `D2L_MCP_CONFIG` and `D2L_ACCESS_TOKEN` environment variables, `d2l` Codex connection key, and `d2l_*` tool names also remain compatible.
+
+## Scope and comparison
+
+This project is an API toolkit for instructors and teaching teams. Prefer documented Brightspace APIs; verified first-party API contracts can extend coverage when supported by evidence. Browser use is limited to human sign-in and bounded authentication/session maintenance. Course operations never use rendered-page scraping, selectors, form filling, or UI fallbacks. An unavailable or rejected API operation must produce a precise limitation rather than trigger browser automation. Student-facing homework-submission, personal study-planning, and target-grade apps are outside the project's intended feature scope; instructor-requested calculations remain client-side analysis.
+
+The following comparison reflects READMEs and selected source reviewed on **2026-10-23**. Links identify the reviewed revisions. It compares capabilities and design choices, not measured reliability or performance; authors' tenant-validation claims remain their claims.
+
+| Project | Documented strengths | Relationship to this project |
+| --- | --- | --- |
+| [RohanMuppa/brightspace-mcp-server][comparison-rohan] | Broad reading tools, instructor submission readers, file extraction, lecture transcripts, setup/doctor commands, and shared HTTP transport. | Stronger reading and installation convenience; Brightspace operations are read-only. |
+| [AnonymousOnyx22/brightspace-d2l-mcp][comparison-onyx] | Submission-aware to-do lists, grade forecasts, calendar exports, interactive SSO, and HTTP transport. | Focuses on student organization and read-only access. Those student workflows are outside our scope. |
+| [JhostinAleck/brightspace-mcp][comparison-jhostin] | Multiple authentication/MFA strategies, credential stores, caching, Docker, and audited/deduplicated writes for submissions, discussion replies, and announcement read status. | Offers more authentication and deployment features. Its documented writes primarily serve student workflows; its [UI submission fallback][comparison-jhostin-writes] is outside our API-only boundary. |
+| [RobertLMcCrary/D2L-MCP][comparison-robert] | Brightspace and Canvas support, generic API reads/writes, uploads, browser session renewal, and cross-platform binaries. | A close general-API alternative. [Generic invocation and lossless JSON][comparison-robert-api], plus avoiding automatic write replay, are shared capabilities rather than unique benefits of ours. |
+| [JesseTho/lamaku-mcp][comparison-lamaku] | Instructor authoring, media uploads, course-package imports, role checks, mandatory confirmation previews, and student pseudonymization. Its author reports live sandbox validation on Lamakū. | The closest instructor-facing alternative; it has more ready-made authoring workflows and stronger student-identity disclosure controls. Our previews are optional and our generic write interface exposes caller-supplied state assertions and verification. |
+| [mcreed-mlri/brightspace-admin-mcp][comparison-admin] | Registered OAuth with token renewal, users/org structure/enrollments, Data Hub exports, and generic GET access. | Targets administrator reporting. Its OAuth and export handling are useful references; broad super-admin tooling is outside our instructor focus. |
+
+Our distinguishing combination is the uniform workflow around API changes: optional before-state assertions, conditional headers where supported, read-back assertions, before/after differences, durable request records, and reconciliation after uncertain outcomes. The [write pipeline](src/client.ts) applies these mechanisms across operations. They are supplied explicitly by the caller; a successful HTTP response alone is not reported as verified success.
+
+The [extensible catalog](catalog/builtin.json) additionally records operation-specific version bounds, schema gaps, replacement behavior, and sources. Retrieval preserves unknown fields and numeric precision, exposes incomplete pagination, and supports resumable result handles. Named-tool counts alone do not compare coverage: this server uses ten composable tools, an extensible catalog, and explicit API paths.
+
+Current gaps include multipart uploads/imports, many validated instructor write models, general student pseudonymization, managed OAuth renewal, shared HTTP service, cross-platform installation, and document extraction. Passing fixture tests does not establish broad tenant compatibility or better reliability than another project. Potential work within the instructor-facing, API-only scope is recorded in [FUTURE.md](FUTURE.md).
+
+The unscoped npm package [`brightspace-mcp`](https://www.npmjs.com/package/brightspace-mcp) belongs to JhostinAleck's project. This repository currently runs from source using the commands below; `npx brightspace-mcp` selects that other project. Any future npm publication of this project needs a distinct scoped package name.
 
 ## Install and authenticate
 
@@ -255,3 +278,12 @@ D2L_TEST_CHROMIUM=/usr/bin/chromium npm run test:integration
 Tests cover session reuse/expiry, CSRF, profile ownership, path/origin/header restrictions, credential-safe redirects, catalog extension, versions, multiple API families, pagination/exports, precision/value preservation, preconditions, compatibility adjustments, verification, uncertain outcomes, and error classification. No live tenant test or production write is claimed. Tenant authentication, permissions, undocumented first-party contracts, and serializer compatibility still require API-based tenant verification.
 
 Sources were checked during implementation on 2026-10-22. The principal references are linked in each catalog entry and [DESIGN.md](DESIGN.md). Recheck the relevant reference before broadening version bounds or adding a serializer.
+
+[comparison-rohan]: https://github.com/RohanMuppa/brightspace-mcp-server/blob/524182cd434863a73e6a50b01d342ef24c65a2eb/README.md
+[comparison-onyx]: https://github.com/AnonymousOnyx22/brightspace-d2l-mcp/blob/1ffcc4ad7a658bd553acaac1bf3a0ede0c08730e/README.md
+[comparison-jhostin]: https://github.com/JhostinAleck/brightspace-mcp/blob/1b85c44fce9eb0d392961f52998a19e8571fdbf6/README.md
+[comparison-jhostin-writes]: https://github.com/JhostinAleck/brightspace-mcp/blob/1b85c44fce9eb0d392961f52998a19e8571fdbf6/docs/writes.md
+[comparison-robert]: https://github.com/RobertLMcCrary/D2L-MCP/blob/1244d84268032114a4459a6090bd0657e869a96f/README.md
+[comparison-robert-api]: https://github.com/RobertLMcCrary/D2L-MCP/blob/1244d84268032114a4459a6090bd0657e869a96f/internal/mcpserver/canvas.go
+[comparison-lamaku]: https://github.com/JesseTho/lamaku-mcp/blob/210083a86ff4ebbbfc60db0af72fc916c5e589c9/README.md
+[comparison-admin]: https://github.com/mcreed-mlri/brightspace-admin-mcp/blob/c59befe3c9ec6bd633685983d1e1067e0696d26b/README.md

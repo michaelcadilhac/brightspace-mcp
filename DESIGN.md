@@ -2,9 +2,11 @@
 
 ## 1. Purpose and governing principle
 
-Build a general-purpose, single-user MCP server that gives Codex authenticated programmatic access to the user's D2L Brightspace account. The browser supplies an authenticated session; all automated D2L operations use APIs.
+Build a general-purpose, single-user, instructor-facing MCP server that gives Codex authenticated programmatic access to an instructor's D2L Brightspace account. The browser supplies an authenticated session; all automated course operations use APIs. The product focus is instructor course management, configuration, and analysis, rather than student study planning or homework submission.
 
 The server is a reusable D2L API interface. Codex interprets the user's requests, discovers relevant operations, retrieves data, performs analysis, and composes the necessary API calls. The server supplies reliable access to those operations without implementing the user's individual teaching policies as built-in features.
+
+The comparison in `README.md` explains this project's positioning against other Brightspace MCP servers. `FUTURE.md` records candidate improvements within the instructor-facing, API-only boundary; those candidates are not assertions of implemented capability or tenant support.
 
 **A new task using an available D2L API should not require a new task-specific MCP tool or a change to the server's business logic.** Extending a declarative API catalog or adding a reusable serializer for a newly encountered contract is different from implementing a feature for each natural-language request.
 
