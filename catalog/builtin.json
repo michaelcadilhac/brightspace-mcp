@@ -1,0 +1,108 @@
+{
+  "revision": "2026-10-22.1",
+  "operations": [
+    {
+      "id": "versions.list", "resource": "api", "description": "Discover all API families and their explicitly supported versions.",
+      "method": "GET", "path": "/d2l/api/versions/", "semantics": "read", "schemaKnowledge": "partial",
+      "support": "documented", "sources": ["https://docs.valence.desire2learn.com/res/apiprop.html"], "pagination": { "kind": "none" },
+      "authentication": "This documented version route permits anonymous calls; the configured provider may also supply authentication."
+    },
+    {
+      "id": "versions.check", "resource": "api", "description": "Check version support using a semantically read-only POST.",
+      "method": "POST", "path": "/d2l/api/versions/check", "semantics": "read", "schemaKnowledge": "partial",
+      "support": "documented", "sources": ["https://docs.valence.desire2learn.com/res/apiprop.html"], "pagination": { "kind": "none" },
+      "requestSchema": { "type": "array", "items": { "type": "object", "required": ["ProductCode", "Version"], "properties": { "ProductCode": { "type": "string" }, "Version": { "type": "string" } }, "additionalProperties": false } }
+    },
+    {
+      "id": "users.whoami", "resource": "users", "description": "Verify the current authenticated account through the API.",
+      "method": "GET", "path": "/d2l/api/lp/{version}/users/whoami", "apiFamily": "lp", "versions": { "min": "1.49", "max": "1.59" },
+      "semantics": "read", "support": "documented", "sources": ["https://docs.valence.desire2learn.com/res/user.html"], "pagination": { "kind": "none" },
+      "responseSchema": { "type": "object", "required": ["Identifier"], "properties": { "Identifier": { "type": ["string", "number"] } }, "additionalProperties": true }
+    },
+    {
+      "id": "enrollments.mine", "resource": "enrollments", "description": "Retrieve the current user's enrollments; term membership must be resolved from org-unit relationships.",
+      "method": "GET", "path": "/d2l/api/lp/{version}/enrollments/myenrollments/", "apiFamily": "lp", "versions": { "min": "1.49", "max": "1.59" },
+      "semantics": "read", "support": "documented", "sources": ["https://docs.valence.desire2learn.com/res/enroll.html"],
+      "permissions": ["enrollment:own_enrollment:read"],
+      "pagination": { "kind": "bookmark", "itemsPointer": "/Items", "hasMorePointer": "/PagingInfo/HasMoreItems", "cursorPointer": "/PagingInfo/Bookmark", "queryParameter": "bookmark", "source": "https://docs.valence.desire2learn.com/res/enroll.html" },
+      "limitations": ["Enrollment permissions may suppress records or roles. Empty results do not establish complete visibility.", "Preserve sortBy filters when following bookmarks."],
+      "querySchema": { "type": "object", "additionalProperties": true, "properties": { "bookmark": { "type": "string" }, "isActive": { "type": "boolean" }, "canAccess": { "type": "boolean" }, "orgUnitTypeId": { "type": "string" }, "sortBy": { "type": ["string", "array"] }, "startDateTime": { "type": "string" }, "endDateTime": { "type": "string" } } }
+    },
+    {
+      "id": "courses.get", "resource": "courses", "description": "Retrieve a course offering, including semester and department relationships when visible.",
+      "method": "GET", "path": "/d2l/api/lp/{version}/courses/{orgUnitId}", "pathParameters": ["orgUnitId"], "apiFamily": "lp", "versions": { "min": "1.49", "max": "1.59" },
+      "semantics": "read", "support": "documented", "sources": ["https://docs.valence.desire2learn.com/res/course.html"], "pagination": { "kind": "none" }
+    },
+    {
+      "id": "classlist.paged", "resource": "enrollments", "description": "Retrieve accessible classlist users, using the documented ObjectListPage contract.",
+      "method": "GET", "path": "/d2l/api/le/{version}/{orgUnitId}/classlist/paged/", "pathParameters": ["orgUnitId"], "apiFamily": "le", "versions": { "min": "1.82", "max": "1.98" },
+      "semantics": "read", "support": "documented", "sources": ["https://docs.valence.desire2learn.com/res/enroll.html"], "permissions": ["enrollment:orgunit:read"],
+      "pagination": { "kind": "next-url", "itemsPointer": "/Objects", "nextPointer": "/Next", "source": "https://docs.valence.desire2learn.com/basic/apicall.html" },
+      "limitations": ["User and role visibility is permission-dependent; a completed page walk does not prove full roster visibility."]
+    },
+    {
+      "id": "sections.list", "resource": "sections", "description": "Retrieve all accessible sections for an org unit in Fetch form.",
+      "method": "GET", "path": "/d2l/api/lp/{version}/{orgUnitId}/sections/", "pathParameters": ["orgUnitId"], "apiFamily": "lp", "versions": { "min": "1.49", "max": "1.59" },
+      "semantics": "read", "support": "documented", "sources": ["https://docs.valence.desire2learn.com/res/groups.html"], "pagination": { "kind": "none", "itemsPointer": "" },
+      "limitations": ["The paged sections route has different coverage: only sections in which the caller is enrolled."]
+    },
+    {
+      "id": "sections.paged", "resource": "sections", "description": "Retrieve only sections in which the calling user is enrolled, in Enrolled form.",
+      "method": "GET", "path": "/d2l/api/lp/{version}/{orgUnitId}/sections/paged", "pathParameters": ["orgUnitId"], "apiFamily": "lp", "versions": { "min": "1.52", "max": "1.59" },
+      "semantics": "read", "support": "documented", "sources": ["https://docs.valence.desire2learn.com/res/groups.html"],
+      "pagination": { "kind": "next-url", "itemsPointer": "/Objects", "nextPointer": "/Next", "source": "https://docs.valence.desire2learn.com/res/groups.html" },
+      "limitations": ["Not a substitute for sections.list when all sections are required."]
+    },
+    {
+      "id": "grades.list", "resource": "grades", "description": "Retrieve the course's grade objects without imposing grading policy.",
+      "method": "GET", "path": "/d2l/api/le/{version}/{orgUnitId}/grades/", "pathParameters": ["orgUnitId"], "apiFamily": "le", "versions": { "min": "1.82", "max": "1.98" },
+      "semantics": "read", "support": "documented", "sources": ["https://docs.valence.desire2learn.com/res/grade.html"], "pagination": { "kind": "none", "itemsPointer": "" }
+    },
+    {
+      "id": "grades.get", "resource": "grades", "description": "Retrieve one grade object; retain its native type, units, and all unknown fields.",
+      "method": "GET", "path": "/d2l/api/le/{version}/{orgUnitId}/grades/{gradeObjectId}", "pathParameters": ["orgUnitId", "gradeObjectId"], "apiFamily": "le", "versions": { "min": "1.82", "max": "1.98" },
+      "semantics": "read", "support": "documented", "sources": ["https://docs.valence.desire2learn.com/res/grade.html"], "pagination": { "kind": "none" }
+    },
+    {
+      "id": "grades.update", "resource": "grades", "description": "Update a grade object using an explicit write-model body.",
+      "method": "PUT", "path": "/d2l/api/le/{version}/{orgUnitId}/grades/{gradeObjectId}", "pathParameters": ["orgUnitId", "gradeObjectId"], "apiFamily": "le", "versions": { "min": "1.82", "max": "1.98" },
+      "semantics": "write", "support": "documented", "sources": ["https://docs.valence.desire2learn.com/res/grade.html"], "updateBehavior": "replace",
+      "limitations": ["A read object is not automatically a valid update model. No generic GET-modify-PUT conversion is performed.", "Creating Formula or final grade types through the public grade-object creation route is restricted; this does not establish absence of other APIs."]
+    },
+    {
+      "id": "quizzes.list", "resource": "quizzes", "description": "Retrieve quiz read models and linked grade-item identifiers.",
+      "method": "GET", "path": "/d2l/api/le/{version}/{orgUnitId}/quizzes/", "pathParameters": ["orgUnitId"], "apiFamily": "le", "versions": { "min": "1.82", "max": "1.98" },
+      "semantics": "read", "support": "documented", "sources": ["https://docs.valence.desire2learn.com/res/quiz.html"],
+      "pagination": { "kind": "next-url", "itemsPointer": "/Objects", "nextPointer": "/Next", "source": "https://docs.valence.desire2learn.com/res/quiz.html" }
+    },
+    {
+      "id": "quizzes.get", "resource": "quizzes", "description": "Retrieve a quiz read model. AttemptsAllowed is nested; the update contract differs.",
+      "method": "GET", "path": "/d2l/api/le/{version}/{orgUnitId}/quizzes/{quizId}", "pathParameters": ["orgUnitId", "quizId"], "apiFamily": "le", "versions": { "min": "1.82", "max": "1.98" },
+      "semantics": "read", "support": "documented", "sources": ["https://docs.valence.desire2learn.com/res/quiz.html"], "pagination": { "kind": "none" },
+      "limitations": ["Password and other protected fields may be redacted. Do not construct a full replacement from an incomplete read model."]
+    },
+    {
+      "id": "quizzes.update", "resource": "quizzes", "description": "Replace quiz properties using an explicit QuizData body. NumberOfAttemptsAllowed is a top-level field.",
+      "method": "PUT", "path": "/d2l/api/le/{version}/{orgUnitId}/quizzes/{quizId}", "pathParameters": ["orgUnitId", "quizId"], "apiFamily": "le", "versions": { "min": "1.82", "max": "1.98" },
+      "semantics": "write", "support": "documented", "sources": ["https://docs.valence.desire2learn.com/res/quiz.html"], "updateBehavior": "replace", "schemaKnowledge": "partial",
+      "requestSchema": { "type": "object", "additionalProperties": true, "properties": { "Name": { "type": "string" }, "IsActive": { "type": "boolean" }, "NumberOfAttemptsAllowed": { "type": ["integer", "null"] } }, "not": { "required": ["AttemptsAllowed"] } },
+      "limitations": ["Schema is structural only; complete QuizData field requirements and version-specific additions require caller review.", "Finite NumberOfAttemptsAllowed must be 1..10 in the documented contract. A legacy zero can be attempted for preservation; only an attributed definitive API rejection permits a caller-authorized omission/default retry.", "Null means unlimited attempts. Omission can reset fields and is not a preservation guarantee.", "No automatic quiz read-to-write serializer is claimed, because protected and rich-text fields require complete contract knowledge."]
+    },
+    {
+      "id": "news.list", "resource": "news", "description": "Retrieve course announcements, an operation independent of the illustrative grading workflows.",
+      "method": "GET", "path": "/d2l/api/le/{version}/{orgUnitId}/news/", "pathParameters": ["orgUnitId"], "apiFamily": "le", "versions": { "min": "1.82", "max": "1.98" },
+      "semantics": "read", "support": "documented", "sources": ["https://docs.valence.desire2learn.com/res/news.html"], "pagination": { "kind": "none", "itemsPointer": "" }
+    },
+    {
+      "id": "news.get", "resource": "news", "description": "Retrieve a specific course announcement.",
+      "method": "GET", "path": "/d2l/api/le/{version}/{orgUnitId}/news/{newsItemId}", "pathParameters": ["orgUnitId", "newsItemId"], "apiFamily": "le", "versions": { "min": "1.82", "max": "1.98" },
+      "semantics": "read", "support": "documented", "sources": ["https://docs.valence.desire2learn.com/res/news.html"], "pagination": { "kind": "none" }
+    },
+    {
+      "id": "news.update", "resource": "news", "description": "Update a course announcement with a caller-supplied NewsItemData contract.",
+      "method": "PUT", "path": "/d2l/api/le/{version}/{orgUnitId}/news/{newsItemId}", "pathParameters": ["orgUnitId", "newsItemId"], "apiFamily": "le", "versions": { "min": "1.82", "max": "1.98" },
+      "semantics": "write", "support": "documented", "sources": ["https://docs.valence.desire2learn.com/res/news.html"], "updateBehavior": "replace", "schemaKnowledge": "unknown",
+      "limitations": ["No complete request schema or serializer is bundled. Review NewsItemData and preserve unrelated properties explicitly."]
+    }
+  ]
+}

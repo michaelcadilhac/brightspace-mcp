@@ -1,0 +1,18 @@
+{
+  "origin": "https://your-tenant.example.edu",
+  "timezone": "America/Chicago",
+  "auth": {
+    "provider": "browser",
+    "csrfStorageKey": "XSRF.Token",
+    "csrfHeader": "X-Csrf-Token",
+    "whoamiVersion": "1.49"
+  },
+  "catalogFiles": [],
+  "apiRoutes": [],
+  "retentionHours": 24,
+  "inlineBytes": 48000,
+  "maxResponseBytes": 20000000,
+  "timeoutMs": 30000,
+  "readRetries": 2,
+  "maxRetryDelayMs": 10000
+}
