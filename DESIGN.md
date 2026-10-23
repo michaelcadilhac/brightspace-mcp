@@ -1,4 +1,4 @@
-# General D2L API MCP Server — Design and Implementation Specification
+# Brightspace MCP Server — Design and Implementation Specification
 
 ## 1. Purpose and governing principle
 
@@ -272,6 +272,8 @@ Completion means the user can ask varied D2L questions and request varied API-su
 ### Implementation status (2026-10-22)
 
 The TypeScript implementation uses the official MCP SDK over local stdio, Playwright's dedicated persistent Chromium profile, Linux kernel profile locking, and private expiring JSON records. `README.md` documents installation, the ten composable tools (including result access and catalog refresh), configuration, contract extension, and fixture demonstrations. `catalog/builtin.json` is a reviewed seed catalog with bounded version ranges; explicit API requests remain available outside that catalog. It asserts no live-tenant validation.
+
+The project, npm package, primary CLI command, and MCP server identity are named `brightspace-mcp`. The `d2l-mcp` command remains an alias, and the existing configuration/state paths, environment variables, Codex connection key, and tool names are retained for compatibility with saved authentication and clients.
 
 Node.js 24 remains the LTS baseline; Node.js 26 is additionally supported and has passed the same unit/MCP, real Chromium, and stdio fixture tests. There is no implementation dependency that requires replacing an existing Node 26 installation.
 

@@ -13,7 +13,7 @@ import { asError, D2LError } from './errors.js';
 import { authenticationError } from './auth-errors.js';
 
 process.umask(0o077);
-const help = `d2l-mcp — Linux, Node.js 24 or 26\n\nCommands:\n  init --origin https://tenant.example.edu [--config PATH]\n  status [--config PATH]\n  login [--config PATH]       Open the dedicated browser for manual SSO/MFA\n  serve [--config PATH]       MCP over stdio; one owner per state directory\n  diagnostics REQUEST_ID [--config PATH]\n  catalog-check [--config PATH]\n\nConfig defaults to $XDG_CONFIG_HOME/d2l-mcp/config.json (or ~/.config/...).\nD2L_MCP_CONFIG may select an alternate file. No course changes occur during setup.\n`;
+const help = `brightspace-mcp — Linux, Node.js 24 or 26\n\nCommands:\n  init --origin https://tenant.example.edu [--config PATH]\n  status [--config PATH]\n  login [--config PATH]       Open the dedicated browser for manual SSO/MFA\n  serve [--config PATH]       MCP over stdio; one owner per state directory\n  diagnostics REQUEST_ID [--config PATH]\n  catalog-check [--config PATH]\n\nThe d2l-mcp command remains an alias.\nConfig defaults to $XDG_CONFIG_HOME/d2l-mcp/config.json (or ~/.config/...).\nD2L_MCP_CONFIG may select an alternate file. No course changes occur during setup.\n`;
 
 async function main() {
   const { values, positionals } = parseArgs({ allowPositionals: true, options: {
@@ -25,7 +25,7 @@ async function main() {
   if (command === 'init') {
     if (!values.origin) throw new D2LError('VALIDATION_REJECTED', '--origin is required.');
     const config = await initConfig(values.origin, path);
-    process.stdout.write(JSON.stringify({ config: path, stateDir: config.stateDir, nextStep: 'Run d2l-mcp login, then d2l-mcp status.' }, null, 2) + '\n'); return;
+    process.stdout.write(JSON.stringify({ config: path, stateDir: config.stateDir, nextStep: 'Run brightspace-mcp login, then brightspace-mcp status.' }, null, 2) + '\n'); return;
   }
   const config = await loadConfig(path);
   if (command === 'catalog-check') {
@@ -46,7 +46,7 @@ async function main() {
     server.server.onclose = () => { void close(); };
     process.stdin.once('end', () => { void server.close().finally(close); });
     await server.connect(transport);
-    process.stderr.write('d2l-mcp ready (stdio); authentication is checked on API use.\n');
+    process.stderr.write('brightspace-mcp ready (stdio); authentication is checked on API use.\n');
     return;
   }
   try {

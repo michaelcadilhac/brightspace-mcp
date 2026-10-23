@@ -12,14 +12,14 @@ import { createServer } from '../src/server.js';
 import type { AuthProvider } from '../src/auth.js';
 
 const { values } = parseArgs({ options: { config: { type: 'string' }, course: { type: 'string', default: '123' }, since: { type: 'string', default: '2026-01-01T00:00:00.000Z' } } });
-const mcp = new Client({ name: 'd2l-composition-example', version: '1.0' });
+const mcp = new Client({ name: 'brightspace-composition-example', version: '1.0' });
 let cleanup: () => Promise<void>;
 if (values.config) {
   await mcp.connect(new StdioClientTransport({ command: process.execPath,
     args: [resolve('dist/cli.js'), 'serve', '--config', resolve(values.config)], stderr: 'inherit' }));
   cleanup = () => mcp.close();
 } else {
-  const stateDir = await mkdtemp(join(tmpdir(), 'd2l-demo-'));
+  const stateDir = await mkdtemp(join(tmpdir(), 'brightspace-demo-'));
   const auth: AuthProvider = { kind: 'fixture', close: async () => {}, send: async url => {
     const data = url.pathname.endsWith('/whoami') ? { Identifier: '42', FirstName: 'Fixture' }
       : url.pathname.endsWith('/versions/') ? [{ ProductCode: 'lp', SupportedVersions: ['1.49'] }, { ProductCode: 'le', SupportedVersions: ['1.82'] }]

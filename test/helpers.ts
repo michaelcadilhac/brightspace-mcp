@@ -25,7 +25,7 @@ export class FakeAuth implements AuthProvider {
   async close() {}
 }
 export async function fixture(t: TestContext, overrides: Record<string, unknown> = {}) {
-  const stateDir = await mkdtemp(join(tmpdir(), 'd2l-mcp-test-'));
+  const stateDir = await mkdtemp(join(tmpdir(), 'brightspace-mcp-test-'));
   t.after(() => rm(stateDir, { recursive: true, force: true }));
   const config = normalizeConfig({ origin: 'https://tenant.example.edu', stateDir, auth: { provider: 'bearer' }, readRetries: 0, ...overrides });
   const auth = new FakeAuth(), client = await createClient(config, auth);

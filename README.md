@@ -1,8 +1,10 @@
-# d2l-mcp
+# brightspace-mcp
 
-A general, single-user Brightspace MCP server for Linux and Node.js 24 or 26. A dedicated Playwright profile supplies the session; course operations use HTTP APIs. Codex discovers contracts and composes requests. There are no course-specific teaching policies, UI automation tools, or production changes during installation.
+A general, single-user MCP server for D2L Brightspace on Linux and Node.js 24 or 26. A dedicated Playwright profile supplies the session; course operations use HTTP APIs. Codex discovers contracts and composes requests. There are no course-specific teaching policies, UI automation tools, or production changes during installation.
 
 The implementation follows [DESIGN.md](DESIGN.md). Its catalog describes known contracts; it does not limit generic access to the configured API boundary.
+
+The primary command is `brightspace-mcp`; `d2l-mcp` remains an alias. Configuration and state retain their existing `d2l-mcp` paths so saved sessions keep working. The `D2L_MCP_CONFIG` and `D2L_ACCESS_TOKEN` environment variables, `d2l` Codex connection key, and `d2l_*` tool names also remain compatible.
 
 ## Install and authenticate
 

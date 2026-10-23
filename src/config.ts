@@ -53,7 +53,7 @@ export function normalizeConfig(input: unknown, base = process.cwd()): Config {
 }
 export async function loadConfig(path = configPath()): Promise<Config> {
   try { return normalizeConfig(JSON.parse(await readFile(path, 'utf8')), dirname(resolve(path))); }
-  catch (e) { if (e instanceof D2LError) throw e; throw new D2LError('VALIDATION_REJECTED', 'Cannot read a valid config. Run d2l-mcp init --origin https://your-tenant first.'); }
+  catch (e) { if (e instanceof D2LError) throw e; throw new D2LError('VALIDATION_REJECTED', 'Cannot read a valid config. Run brightspace-mcp init --origin https://your-tenant first.'); }
 }
 export async function initConfig(origin: string, path = configPath()): Promise<Config> {
   const cfg = normalizeConfig({ origin });

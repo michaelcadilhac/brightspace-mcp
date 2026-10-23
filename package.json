@@ -1,10 +1,10 @@
 {
-  "name": "d2l-mcp",
+  "name": "brightspace-mcp",
   "version": "0.1.0",
   "private": true,
-  "description": "Single-user, API-only Brightspace MCP server",
+  "description": "MCP server for D2L Brightspace",
   "type": "module",
-  "bin": { "d2l-mcp": "dist/cli.js" },
+  "bin": { "brightspace-mcp": "dist/cli.js", "d2l-mcp": "dist/cli.js" },
   "engines": { "node": "^24.0.0 || ^26.0.0" },
   "scripts": {
     "build": "tsc -p tsconfig.json",
@@ -12,7 +12,7 @@
     "test": "node --import tsx --test test/*.test.ts",
     "test:integration": "npm run build && node --import tsx --test test/*.integration.ts",
     "start": "node dist/cli.js serve",
-    "codex": "sh scripts/codex-d2l.sh",
+    "codex": "sh scripts/codex-brightspace.sh",
     "demo": "node --import tsx examples/compose.ts"
   },
   "dependencies": {

@@ -45,7 +45,7 @@ export class ApiTransport {
     const text = body.toString('utf8');
     const html = /(?:text\/html|application\/xhtml)/.test(contentType) || /^\s*<(?:!doctype\s+html|html)\b/i.test(text);
     const login = html && /(?:login|sign[ -]?in|saml|sso|password|authenticat)/i.test(text);
-    if (status === 401 || login) throw new D2LError('AUTHENTICATION_REQUIRED', 'The API requires fresh authentication. Login content was discarded.', { status }, 'Stop the server, run d2l-mcp login, and restart the server.');
+    if (status === 401 || login) throw new D2LError('AUTHENTICATION_REQUIRED', 'The API requires fresh authentication. Login content was discarded.', { status }, 'Stop the server, run brightspace-mcp login, and restart the server.');
     if (status >= 400 || status === 304) {
       let evidence: unknown;
       try { evidence = parseJson(text); } catch { evidence = html ? '[HTML response discarded]' : text.slice(0, 2000); }

@@ -5,7 +5,7 @@ repository=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd -P)
 cd "$repository"
 
 if [ ! -f dist/cli.js ]; then
-  printf '%s\n' 'Build the D2L server first: npm run build' >&2
+  printf '%s\n' 'Build the Brightspace server first: npm run build' >&2
   exit 1
 fi
 
