@@ -4,13 +4,14 @@ import type { D2LClient } from './client.js';
 import { asError, D2LError } from './errors.js';
 import { requestSchema, writeSchema, paginateSchema, checkSchema } from './schemas.js';
 
-export function createServer(client: D2LClient): McpServer {
+export function createServer(client: D2LClient, beforeCall?: () => void): McpServer {
   const server = new McpServer({ name: 'brightspace-mcp', version: '0.1.0' }, {
     instructions: 'General Brightspace API access. Discover and inspect contracts, then compose explicit reads and writes. Resolve policy and scope client-side. A successful HTTP response or page traversal does not establish a whole task is complete. Never use UI automation as a fallback.'
   });
   const read = { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: true };
   const run = async (action: () => Promise<unknown>) => {
     try {
+      beforeCall?.();
       const value = client.redactor.clean(await client.serial(action));
       const structuredContent = value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : { result: value };
       return { content: [{ type: 'text' as const, text: JSON.stringify(structuredContent) }], structuredContent };

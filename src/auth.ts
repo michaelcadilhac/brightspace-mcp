@@ -39,7 +39,7 @@ export class BrowserAuth implements AuthProvider {
   private refreshAttempted = false;
   private refreshing?: Promise<SessionRefresh>;
   constructor(readonly config: Config, readonly redactor: Redactor, readonly boundary: Boundary) {}
-  async open(headless = true): Promise<BrowserContext> {
+  async open(headless = true, displayEnv?: Record<string, string>): Promise<BrowserContext> {
     if (this.context) {
       if (this.contextClosed) throw authenticationError(new Error('Browser context closed'), 'open-session');
       return this.context;
@@ -54,7 +54,8 @@ export class BrowserAuth implements AuthProvider {
       try {
         this.context = await chromium.launchPersistentContext(profile, {
           headless, executablePath: browser.path, acceptDownloads: false,
-          serviceWorkers: 'block', timeout: 30000
+          serviceWorkers: 'block', timeout: 30000,
+          env: displayEnv ? { ...Object.fromEntries(Object.entries(process.env).filter((entry): entry is [string, string] => entry[1] !== undefined)), ...displayEnv } : undefined
         });
         this.headless = headless;
         this.contextClosed = false;

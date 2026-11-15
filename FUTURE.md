@@ -111,13 +111,13 @@ Add an optional authorization-code/refresh-token provider for institutions that 
 
 **Inspiration:** [RobertLMcCrary's cross-platform releases][robert] and [RohanMuppa's setup experience][rohan].
 
-## Optional: Shared local service and HTTP transport
+## Optional: Authenticated HTTP transport
 
-If multiple authorized clients need the same session, investigate a single local session owner with thin clients and an authenticated MCP HTTP transport. Keep stdio as the default and sharing an explicit opt-in.
+Multiple local stdio clients now share one session owner and serial tool queue through a private Unix socket. Further work could add an explicitly configured, authenticated MCP HTTP transport. Keep stdio as the default.
 
 - Serialize mutation sequences, preserve request attribution and account identity, and handle disconnected clients and uncertain in-flight writes.
 - Bind locally by default, enforce transport authentication and origin controls, and define shutdown/ownership behavior before adding remote deployment options.
-- Avoid global client registration, automatic server startup in unrelated chats, or a background task scheduler. Client workflows retain scheduling responsibility.
+- Preserve the existing opt-in client registration and start the owner only for enabled connections. Avoid a background task scheduler. Client workflows retain scheduling responsibility.
 
 **Completion evidence:** multiple-client and reconnect tests, authenticated transport tests, preserved profile ownership, and no startup changes for ordinary Codex sessions.
 

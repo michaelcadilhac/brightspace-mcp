@@ -27,7 +27,7 @@ export class D2LClient {
   constructor(readonly config: Config, readonly auth: AuthProvider, readonly transport: ApiTransport,
     readonly boundary: Boundary, readonly catalog: Catalog, readonly store: Store, readonly redactor: Redactor) {}
 
-  /** A single queue makes precondition/write/read-back sequences indivisible with respect to this process. */
+  /** The shared session's queue keeps each tool's precondition/write/read-back sequence together across connections. */
   serial<T>(action: () => Promise<T>): Promise<T> {
     const run = this.queue.then(action, action); this.queue = run.catch(() => {}); return run;
   }

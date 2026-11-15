@@ -168,7 +168,9 @@ Use TypeScript, a currently supported Node.js LTS release, the official MCP Type
 
 Support local stdio use with Codex. Protocol output belongs on stdout; diagnostics belong on stderr. Document registration using current Codex instructions. [R4], [R11]
 
-Ensure a single owner of the dedicated browser profile. A local session daemon with thin stdio clients is a suitable deployment when multiple clients share the session. A single-process deployment with a profile lock is acceptable when it meets the same ownership and lifecycle requirements. Startup races and login commands must not launch competing profile owners.
+Ensure a single owner of the dedicated browser profile. Thin stdio clients attach to an automatically started local session daemon through a private Unix socket. The daemon holds the kernel profile lock and shares one authenticated API client, catalog, store, and serial tool queue across independent MCP protocol sessions. Closing one client does not stop other clients. After one second without connections, the owner drains queued work, closes the browser, and exits. Startup races and login commands must not launch competing profile owners. A disconnected or restarted transport never replays a request.
+
+CLI status uses the shared MCP session. Explicit interactive login uses a separate local control connection, pauses new API tool calls, switches the owner's browser to manual sign-in, and completes capture/identity verification before API calls resume. Only display-related environment values are forwarded from the terminal. There is no MCP browser/login tool, TCP listener, global client registration, or change to the authenticated API boundary. Configuration or bearer-credential mismatches must fail explicitly instead of reusing a different account's session.
 
 Persist only the general infrastructure's state: account configuration, profile, API catalog/cache, request status, and technical audits as needed. Do not introduce tables or services specifically for a 60% exam rule, nine weekly quizzes, or a particular category-weight policy.
 
@@ -271,9 +273,9 @@ Completion means the user can ask varied D2L questions and request varied API-su
 
 ## 10. Primary references
 
-### Implementation status (2026-10-22)
+### Implementation status (2026-11-02)
 
-The TypeScript implementation uses the official MCP SDK over local stdio, Playwright's dedicated persistent Chromium profile, Linux kernel profile locking, and private expiring JSON records. `README.md` documents installation, the ten composable tools (including result access and catalog refresh), configuration, contract extension, and fixture demonstrations. `catalog/builtin.json` is a reviewed seed catalog with bounded version ranges; explicit API requests remain available outside that catalog. It asserts no live-tenant validation.
+The TypeScript implementation uses the official MCP SDK over local stdio, a shared local session owner with a private Unix socket, Playwright's dedicated persistent Chromium profile, Linux kernel profile locking, and private expiring JSON records. Multiple stdio clients and CLI status/login share the owner without competing for the profile. Whole tool calls are serialized across clients; connection loss never replays a request. `README.md` documents installation, the ten composable tools (including result access and catalog refresh), configuration, contract extension, and fixture demonstrations. `catalog/builtin.json` is a reviewed seed catalog with bounded version ranges; explicit API requests remain available outside that catalog. It asserts no live-tenant validation.
 
 The project, npm package, primary CLI command, and MCP server identity are named `brightspace-mcp`. The `d2l-mcp` command remains an alias, and the existing configuration/state paths, environment variables, Codex connection key, and tool names are retained for compatibility with saved authentication and clients.
 
